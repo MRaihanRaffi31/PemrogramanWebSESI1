@@ -1,0 +1,125 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Background */
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Judul */
+h2, h3 {
+    text-align: center;
+    color: white;
+    margin-bottom: 10px;
+}
+
+/* Form Container */
+form {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 700px;
+}
+
+/* Table layout tetap rapi */
+table {
+    width: 100%;
+}
+
+td {
+    padding: 8px;
+    vertical-align: top;
+}
+
+/* Input & Select & Textarea */
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+/* Focus effect */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #1e3c72;
+    outline: none;
+    box-shadow: 0 0 5px rgba(30,60,114,0.5);
+}
+
+/* Radio & Checkbox khusus */
+input[type="radio"],
+input[type="checkbox"] {
+    width: auto;
+    margin-right: 5px;
+}
+
+/* Textarea */
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Button */
+button {
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: 0.3s;
+}
+
+/* Submit */
+button[type="submit"] {
+    background: #1e3c72;
+    color: white;
+}
+
+button[type="submit"]:hover {
+    background: #ff6600;
+}
+
+/* Reset */
+button[type="reset"] {
+    background: #999;
+    color: white;
+}
+
+button[type="reset"]:hover {
+    background: #666;
+}
+
+/* Disabled */
+button[disabled] {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Link bawah */
+a {
+    margin-top: 20px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}

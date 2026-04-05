@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Kontak Lengkap</title>
+</head>
+<body>
+
+    <h2>Hubungi Kami</h2>
+    <p>Silakan isi detail kontak Anda di bawah ini.</p>
+
+    <form action="proses.php" method="post">
+        <table border="0" cellpadding="8">
+            <tr>
+                <td><label for="nama">Nama Lengkap</label></td>
+                <td>:</td>
+                <td><input type="text" id="nama" name="nama" placeholder="Nama lengkap" required size="30"></td>
+            </tr>
+
+            <tr>
+                <td><label for="email">Alamat Email</label></td>
+                <td>:</td>
+                <td><input type="email" id="email" name="email" placeholder="email@contoh.com" required size="30"></td>
+            </tr>
+
+            <tr>
+                <td><label for="hp">Nomor HP</label></td>
+                <td>:</td>
+                <td>
+                    <input type="tel" id="hp" name="hp" placeholder="Contoh: 08123456789" required size="30">
+                </td>
+            </tr>
+
+            <tr>
+                <td valign="top"><label for="pesan">Pesan</label></td>
+                <td valign="top">:</td>
+                <td>
+                    <textarea id="pesan" name="pesan" rows="4" cols="32" placeholder="Tulis pesan Anda..."></textarea>
+                </td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td></td>
+                <td>
+                    <br>
+                    <button type="submit">Kirim Data</button>
+                    <button type="reset">Reset</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</body>
+</html>

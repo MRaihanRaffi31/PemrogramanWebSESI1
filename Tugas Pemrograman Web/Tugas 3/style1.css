@@ -1,0 +1,112 @@
+/* Reset Dasar */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #333;
+    padding: 20px;
+}
+
+/* Container Efek Kertas */
+body > * {
+    background: #ffffff;
+    margin: 20px auto;
+    padding: 25px;
+    width: 90%;
+    max-width: 1000px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Judul */
+h1 {
+    text-align: center;
+    color: #1e3c72;
+    margin-bottom: 15px;
+}
+
+h2 {
+    color: #2a5298;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+/* Link */
+a {
+    text-decoration: none;
+    color: #1e3c72;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #ff6600;
+}
+
+/* Table */
+table {
+    border-collapse: collapse;
+    margin: 20px auto;
+    width: 90%;
+}
+
+table th {
+    background-color: #1e3c72;
+    color: white;
+    padding: 10px;
+}
+
+table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Paragraf */
+p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* Gambar */
+img {
+    display: block;
+    margin: 15px auto;
+    border-radius: 10px;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* List */
+ol {
+    margin-left: 25px;
+    margin-bottom: 15px;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+/* Tombol Kembali */
+a[href="index.html"] {
+    display: inline-block;
+    margin-bottom: 15px;
+    padding: 8px 15px;
+    background-color: #1e3c72;
+    color: white;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+a[href="index.html"]:hover {
+    background-color: #ff6600;
+}

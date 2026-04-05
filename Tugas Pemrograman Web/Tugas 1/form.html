@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertemuan 3</title>
+</head>
+<body>
+
+    <h2 style="text-align: center;">Formulir Kontak</h2>
+    <h3 style="text-align: center;">Isi Formulir di bawah ini untuk menghubungi saya</h3>
+
+    <form action="coba.html" method="post">
+        <table>
+
+            <tr>
+                <td><label for="Email">Email</label></td>
+                <td>:</td>
+                <td><input type="email" id="Email" placeholder="Masukkan Email" name="Email"/></td>
+            </tr>
+        
+
+            <tr>
+                <td><label for="Password">Password</label></td>
+                <td>:</td>
+                <td><input type="password" id="Password" placeholder="Masukkan Password" name="Password" /></td>
+            </tr>
+
+            <tr>
+                <td><label for="Nama">Nama</label></td>
+                <td>:</td>
+                <td><input type="text" id="Nama" placeholder="Masukkan Nama" name="Nama"/></td>
+            </tr>
+
+            <tr>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td valign="top"><label>Jenis kelamin</label></td>
+                <td valign="top">:</td>
+                <td>
+                    <input type="radio" name="jenis_kelamin" id="perempuan" value="perempuan" />
+                    <label for="perempuan">Perempuan</label>
+                    <br>
+                    <input type="radio" name="jenis_kelamin" id="laki" value="laki" />
+                    <label for="laki">Laki-laki</label>
+                </td>
+            </tr>
+
+            <tr>
+                <td><label for="hp">Nomor HP</label></td>
+                <td>:</td>
+                <td>
+                    <input type="tel" id="hp" name="hp" placeholder="Contoh: 08123456789" required size="30">
+                </td>
+            </tr>
+
+            <tr>
+                <td><label for="subjek">Subjek</label></td>
+                <td>:</td>
+                <td>
+                    <select id="subjek" name="subjek">
+                        <option value="umum">Pertanyaan Umum</option
+                        <option value="kerjasama">Kerja Sama</option>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td valign="top"><label for="pesan">Pesan</label></td>
+                <td valign="top">:</td>
+                <td>
+                    <textarea id="pesan" name="pesan"  placeholder="Tulis pesan Anda..."></textarea>
+                </td>
+            </tr>
+
+            <tr>
+                <td valign="top"><label>Keahlian</label></td>
+                <td valign="top">:</td>
+                <td>
+                    <input type="checkbox" name="jaringan" id="jaringan">
+                    <label for="jaringan">Jaringan</label><br>
+                    
+                    <input type="checkbox" name="multmedia" id="multmedia">
+                    <label for="multmedia">Multimedia</label><br>
+                    
+                    <input type="checkbox" name="pemrograman" id="pemrograman">
+                    <label for="pemrograman">Pemrograman</label>
+
+                    <input type="checkbox" name="sains" id="sains">
+                    <label for="sains">Sains</label>
+
+                    <input type="checkbox" name="ilmu komputer" id="ilmukomputer">
+                    <label for="ilmukomputer">Ilmu Komputer</label>
+
+                    <input type="checkbox" name="bahasa" id="bahasa">
+                    <label for="bahasa">Bahasa</label>
+
+                    <input type="checkbox" name="ipa" id="ipa">
+                    <label for="ipa">IPA</label>
+
+                    <input type="checkbox" name="ips" id="ips">
+                    <label for="ips">IPS</label>
+                </td>
+            </tr>
+
+            <tr>
+                <td><label for="file">Masukkan File</label></td>
+                <td>:</td>
+                <td><input type="file" id="file" name="file"></td>
+            </tr>
+
+            <tr>
+                <td><label for="warna">Pilih Warna Favorit anda</label></td>
+                <td>:</td>
+                <td><input type="color" id="warna" name="warna"></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td></td>
+                <td>
+                    <br>
+                    <button type="submit">Submit</button>
+                    <button disabled="disabled">Disabled</button>
+                    <button type="reset">Reset</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</body>
+</html>
+
+<a href="index.html">Kembali ke Halaman Utama</a>
