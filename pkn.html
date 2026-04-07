@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PKN SMP — Media Pembelajaran Interaktif</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Playfair Display', 'serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --fg: #1c1917;
+            --muted: #78716c;
+            --accent: #dc2626;
+            --accent2: #f59e0b;
+            --card: #ffffff;
+            --border: #e7e5e4;
+        }
+        .dark {
+            --bg: #1a1816;
+            --fg: #f5f5f4;
+            --muted: #a8a29e;
+            --accent: #f87171;
+            --accent2: #fbbf24;
+            --card: #292524;
+            --border: #3d3835;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            margin: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+        .font-display { font-family: 'Playfair Display', serif; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #b91c1c; border-radius: 99px; }
+
+        /* Hero */
+        .hero-section {
+            background: linear-gradient(160deg, #450a0a 0%, #7f1d1d 25%, #991b1b 50%, #b91c1c 75%, #dc2626 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 70% 20%, rgba(251,191,36,0.12) 0%, transparent 60%),
+                        radial-gradient(ellipse at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 50%);
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2l2 3.5-2 3z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* Partikel */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(251,191,36,0.5);
+            pointer-events: none;
+        }
+        @keyframes rise {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 0.6; }
+            100% { transform: translateY(-90vh) scale(0.3); opacity: 0; }
+        }
+
+        /* Reveal animasi */
+        .anim-reveal {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+        .anim-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Card hover */
+        .card-hover {
+            background: var(--card);
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-hover::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #dc2626, #f59e0b);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.35s ease;
+        }
+        .card-hover:hover::after { transform: scaleX(1); }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px rgba(185,28,28,0.1);
+        }
+
+        /* Navbar */
+        .navbar {
+            transition: background 0.3s, backdrop-filter 0.3s, box-shadow 0.3s;
+        }
+        .navbar.scrolled {
+            background: var(--card) !important;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Kuis option */
+        .opt-btn {
+            background: var(--card);
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .opt-btn:hover:not(.locked) { border-color: var(--accent); transform: scale(1.015); }
+        .opt-btn.picked-correct { border-color: #059669; background: rgba(5,150,105,0.08); }
+        .opt-btn.picked-wrong { border-color: #dc2626; background: rgba(220,38,38,0.08); }
+        .opt-btn.show-correct { border-color: #059669; background: rgba(5,150,105,0.06); }
+
+        /* Match item */
+        .match-btn {
+            background: var(--card);
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .match-btn:hover:not(.done) { border-color: var(--accent); }
+        .match-btn.active-pick { border-color: #f59e0b; background: rgba(245,158,11,0.06); }
+        .match-btn.done { border-color: #059669 !important; background: rgba(5,150,105,0.06) !important; opacity: 0.6; pointer-events: none; }
+        .match-btn.shake-it { animation: shake 0.35s ease; }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        /* Accordion */
+        .acc-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.45s ease;
+        }
+        .acc-body.open { max-height: 600px; }
+        .acc-chevron { transition: transform 0.3s; }
+        .acc-chevron.rot { transform: rotate(180deg); }
+
+        /* Progress ring */
+        .ring-circle {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 0.8s ease;
+        }
+
+        /* Toast */
+        @keyframes toastIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
+        .toast-msg { animation: toastIn 0.35s ease, toastOut 0.35s ease 2.5s forwards; }
+
+        /* Timeline */
+        .tl-line { background: linear-gradient(180deg, #dc2626, #f59e0b, #059669); }
+        .tl-dot { box-shadow: 0 0 0 4px var(--bg), 0 0 0 6px #dc2626; }
+
+        /* Back to top */
+        .btt { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .btt.show { opacity: 1; pointer-events: auto; }
+
+        /* Modal */
+        .modal-bg { opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+        .modal-bg.open { opacity: 1; pointer-events: auto; }
+        .modal-box { transform: scale(0.92) translateY(16px); transition: transform 0.3s ease; }
+        .modal-bg.open .modal-box { transform: scale(1) translateY(0); }
+
+        /* Garuda glow */
+        @keyframes garudaGlow {
+            0%,100% { filter: drop-shadow(0 0 25px rgba(251,191,36,0.25)); }
+            50% { filter: drop-shadow(0 0 45px rgba(251,191,36,0.45)); }
+        }
+        .garuda-svg { animation: garudaGlow 4s ease-in-out infinite; }
+
+        /* Wave */
+        .wave-div { fill: var(--bg); }
+
+        @media (prefers-reduced-motion: reduce) {
+            .anim-reveal { opacity: 1; transform: none; transition: none; }
+            .particle, .garuda-svg { animation: none !important; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+<!-- ========== TOAST CONTAINER ========== -->
+<div id="toasts" class="fixed top-20 right-4 z-[200] flex flex-col gap-2"></div>
+
+<!-- ========== BACK TO TOP ========== -->
+<button id="bttBtn" class="btt fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-red-700 text-white shadow-xl flex items-center justify-center hover:bg-red-800 transition-colors" aria-label="Kembali ke atas">
+    <i class="fas fa-chevron-up"></i>
+</button>
+
+<!-- ========== NAVBAR ========== -->
+<nav id="nav" class="navbar fixed top-0 left-0 right-0 z-[100] bg-transparent">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 lg:h-[72px]">
+        <a href="#" class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-700 to-amber-500 flex items-center justify-center shadow-lg">
+                <i class="fas fa-landmark text-white text-sm"></i>
+            </div>
+            <div class="leading-tight">
+                <span class="font-bold text-base block" style="color:var(--fg)">PKN SMP</span>
+                <span class="text-[11px] block" style="color:var(--muted)">Media Pembelajaran</span>
+            </div>
+        </a>
+        <div class="hidden lg:flex items-center gap-1">
+            <a href="#hero" class="px-4 py-2 rounded-lg text-sm font-medium hover:text-red-600 transition-colors" style="color:var(--fg)">Beranda</a>
+            <a href="#materi" class="px-4 py-2 rounded-lg text-sm font-medium hover:text-red-600 transition-colors" style="color:var(--fg)">Materi</a>
+            <a href="#timeline" class="px-4 py-2 rounded-lg text-sm font-medium hover:text-red-600 transition-colors" style="color:var(--fg)">Timeline</a>
+            <a href="#kuis" class="px-4 py-2 rounded-lg text-sm font-medium hover:text-red-600 transition-colors" style="color:var(--fg)">Kuis</a>
+            <a href="#cocokkan" class="px-4 py-2 rounded-lg text-sm font-medium hover:text-red-600 transition-colors" style="color:var(--fg)">Cocokkan</a>
+            <a href="#glosarium" class="px-4 py-2 rounded-lg text-sm font-medium hover:text-red-600 transition-colors" style="color:var(--fg)">Glosarium</a>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="themeBtn" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" style="color:var(--fg)" aria-label="Ganti tema">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+            <button id="menuBtn" class="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" style="color:var(--fg)" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobMenu" class="lg:hidden hidden border-t" style="background:var(--card);border-color:var(--border)">
+        <div class="px-4 py-3 flex flex-col gap-1">
+            <a href="#hero" class="mob-link px-4 py-3 rounded-lg text-sm font-medium hover:text-red-600" style="color:var(--fg)"><i class="fas fa-home w-5 mr-2"></i>Beranda</a>
+            <a href="#materi" class="mob-link px-4 py-3 rounded-lg text-sm font-medium hover:text-red-600" style="color:var(--fg)"><i class="fas fa-book w-5 mr-2"></i>Materi</a>
+            <a href="#timeline" class="mob-link px-4 py-3 rounded-lg text-sm font-medium hover:text-red-600" style="color:var(--fg)"><i class="fas fa-clock-rotate-left w-5 mr-2"></i>Timeline</a>
+            <a href="#kuis" class="mob-link px-4 py-3 rounded-lg text-sm font-medium hover:text-red-600" style="color:var(--fg)"><i class="fas fa-question-circle w-5 mr-2"></i>Kuis</a>
+            <a href="#cocokkan" class="mob-link px-4 py-3 rounded-lg text-sm font-medium hover:text-red-600" style="color:var(--fg)"><i class="fas fa-puzzle-piece w-5 mr-2"></i>Cocokkan</a>
+            <a href="#glosarium" class="mob-link px-4 py-3 rounded-lg text-sm font-medium hover:text-red-600" style="color:var(--fg)"><i class="fas fa-spell-check w-5 mr-2"></i>Glosarium</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<section id="hero" class="hero-section min-h-screen flex items-center pt-16">
+    <div id="particleBox" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10 w-full">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="text-white">
+                <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-1.5 mb-6 text-sm font-medium anim-reveal">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    Tahun Ajaran 2024/2025
+                </div>
+                <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.1] mb-6 anim-reveal">
+                    Pendidikan<br><span class="text-amber-400">Kewarganegaraan</span>
+                </h1>
+                <p class="text-white/75 text-lg sm:text-xl max-w-lg mb-8 leading-relaxed anim-reveal">
+                    Pelajari nilai-nilai Pancasila, demokrasi, hak asasi manusia, dan tanggung jawab sebagai warga negara Indonesia melalui media pembelajaran yang interaktif dan menyenangkan.
+                </p>
+                <div class="flex flex-wrap gap-4 anim-reveal">
+                    <a href="#materi" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-stone-900 font-bold px-8 py-4 rounded-2xl transition-all hover:scale-105 shadow-lg shadow-amber-500/25">
+                        <i class="fas fa-rocket"></i> Mulai Belajar
+                    </a>
+                    <a href="#kuis" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white font-semibold px-8 py-4 rounded-2xl transition-all hover:scale-105">
+                        <i class="fas fa-brain"></i> Uji Kemampuan
+                    </a>
+                </div>
+                <div class="flex gap-8 mt-12 anim-reveal">
+                    <div><div class="text-3xl font-bold text-amber-400">8</div><div class="text-white/50 text-sm">Bab Materi</div></div>
+                    <div><div class="text-3xl font-bold text-amber-400">10</div><div class="text-white/50 text-sm">Soal Kuis</div></div>
+                    <div><div class="text-3xl font-bold text-amber-400">16</div><div class="text-white/50 text-sm">Istilah</div></div>
+                </div>
+            </div>
+            <div class="hidden lg:flex justify-center anim-reveal">
+                <svg class="garuda-svg w-72 h-72 xl:w-80 xl:h-80" viewBox="0 0 200 200" fill="none">
+                    <circle cx="100" cy="100" r="95" stroke="rgba(251,191,36,0.25)" stroke-width="1"/>
+                    <circle cx="100" cy="100" r="78" stroke="rgba(251,191,36,0.15)" stroke-width="0.5"/>
+                    <path d="M100 38 L68 80 L48 74 L58 96 L38 102 L54 112 L48 132 L68 120 L78 142 L100 126 L122 142 L132 120 L152 132 L146 112 L162 102 L142 96 L152 74 L132 80 Z" fill="rgba(251,191,36,0.1)" stroke="rgba(251,191,36,0.5)" stroke-width="1.5"/>
+                    <path d="M85 94 L85 116 Q100 132 115 116 L115 94 Q100 83 85 94Z" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.7)" stroke-width="1"/>
+                    <line x1="100" y1="88" x2="100" y2="122" stroke="rgba(251,191,36,0.4)" stroke-width="0.7"/>
+                    <line x1="84" y1="105" x2="116" y2="105" stroke="rgba(251,191,36,0.4)" stroke-width="0.7"/>
+                    <circle cx="100" cy="62" r="3" fill="rgba(251,191,36,0.7)"/>
+                    <path d="M68 152 Q100 162 132 152" stroke="rgba(251,191,36,0.4)" stroke-width="1.5" fill="none"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0"><svg viewBox="0 0 1440 100" fill="none"><path class="wave-div" d="M0 100L48 92C96 84 192 68 288 62C384 56 480 60 576 68C672 76 768 88 864 88C960 88 1056 76 1152 68C1248 60 1344 56 1392 54L1440 52V100H0Z"/></svg></div>
+</section>
+
+<!-- ========== KOMPETENSI DASAR ========== -->
+<section class="py-16 lg:py-24" style="background:var(--bg)">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 anim-reveal">
+            <span class="inline-block bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Kompetensi Dasar</span>
+            <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4" style="color:var(--fg)">Capaian Pembelajaran</h2>
+            <p class="text-lg max-w-2xl mx-auto" style="color:var(--muted)">Empat pilar kompetensi utama mata pelajaran PKN di jenjang SMP</p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="card-hover rounded-2xl p-6 text-center anim-reveal">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-500/20"><i class="fas fa-heart text-white text-lg"></i></div>
+                <h3 class="font-bold text-base mb-2" style="color:var(--fg)">Nilai Pancasila</h3>
+                <p class="text-sm leading-relaxed" style="color:var(--muted)">Memahami, menghayati, dan mengamalkan nilai-nilai Pancasila dalam kehidupan sehari-hari</p>
+            </div>
+            <div class="card-hover rounded-2xl p-6 text-center anim-reveal">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/20"><i class="fas fa-scale-balanced text-white text-lg"></i></div>
+                <h3 class="font-bold text-base mb-2" style="color:var(--fg)">Hukum dan HAM</h3>
+                <p class="text-sm leading-relaxed" style="color:var(--muted)">Mengenal sistem hukum nasional dan pemahaman hak asasi manusia secara utuh</p>
+            </div>
+            <div class="card-hover rounded-2xl p-6 text-center anim-reveal">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/20"><i class="fas fa-people-group text-white text-lg"></i></div>
+                <h3 class="font-bold text-base mb-2" style="color:var(--fg)">Demokrasi</h3>
+                <p class="text-sm leading-relaxed" style="color:var(--muted)">Memahami prinsip dan praktik demokrasi serta partisipasi dalam bermasyarakat</p>
+            </div>
+            <div class="card-hover rounded-2xl p-6 text-center anim-reveal">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-500/20"><i class="fas fa-earth-asia text-white text-lg"></i></div>
+                <h3 class="font-bold text-base mb-2" style="color:var(--fg)">Bhinneka Tunggal Ika</h3>
+                <p class="text-sm leading-relaxed" style="color:var(--muted)">Menghargai keberagaman suku, agama, ras, dan budaya sebagai kekuatan bangsa</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== MATERI ========== -->
+<section id="materi" class="py-16 lg:py-24" style="background:var(--bg)">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 anim-reveal">
+            <span class="inline-block bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Materi Lengkap</span>
+            <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4" style="color:var(--fg)">Bab-Bab Pembelajaran</h2>
+            <p class="text-lg max-w-2xl mx-auto" style="color:var(--muted)">Klik setiap bab untuk membaca ringkasan materi secara lengkap</p>
+        </div>
+        <div class="max-w-md mx-auto mb-8 anim-reveal">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--muted)"></i>
+                <input id="searchInput" type="text" placeholder="Cari materi..." class="w-full pl-11 pr-4 py-3 rounded-xl border-2 text-sm focus:outline-none focus:border-red-500 transition-colors" style="background:var(--card);border-color:var(--border);color:var(--fg)">
+            </div>
+        </div>
+        <div id="materiGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+    </div>
+</section>
+
+<!-- ========== MODAL MATERI ========== -->
+<div id="materiModal" class="modal-bg fixed inset-0 z-[150] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.55)">
+    <div class="modal-box w-full max-w-3xl max-h-[88vh] rounded-3xl overflow-hidden shadow-2xl" style="background:var(--card)">
+        <div class="bg-gradient-to-r from-red-800 to-red-600 p-5 sm:p-6 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors" aria-label="Tutup"><i class="fas fa-times text-sm"></i></button>
+            <span id="modalBadge" class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-2"></span>
+            <h3 id="modalTitle" class="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-white"></h3>
+        </div>
+        <div id="modalBody" class="p-5 sm:p-6 overflow-y-auto" style="max-height:calc(88vh - 110px)"></div>
+    </div>
+</div>
+
+<!-- ========== TIMELINE ========== -->
+<section id="timeline" class="py-16 lg:py-24" style="background:var(--bg)">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 anim-reveal">
+            <span class="inline-block bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Perjalanan Bangsa</span>
+            <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4" style="color:var(--fg)">Timeline Sejarah</h2>
+            <p class="text-lg max-w-2xl mx-auto" style="color:var(--muted)">Momen-momen penting dalam perjuangan bangsa Indonesia menuju kemerdekaan</p>
+        </div>
+        <div class="relative">
+            <div class="absolute left-5 lg:left-1/2 top-0 bottom-0 w-0.5 tl-line lg:-translate-x-px"></div>
+            <div id="timelineBox" class="space-y-8"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== KUIS ========== -->
+<section id="kuis" class="py-16 lg:py-24" style="background:var(--bg)">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 anim-reveal">
+            <span class="inline-block bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Evaluasi Pembelajaran</span>
+            <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4" style="color:var(--fg)">Kuis Interaktif</h2>
+            <p class="text-lg max-w-2xl mx-auto" style="color:var(--muted)">Uji pemahamanmu dengan 10 soal pilihan ganda seputar materi PKN</p>
+        </div>
+
+        <!-- Mulai -->
+        <div id="quizStart" class="text-center p-8 rounded-3xl border-2 anim-reveal" style="background:var(--card);border-color:var(--border)">
+            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-red-600 to-amber-500 flex items-center justify-center mx-auto mb-5 shadow-xl"><i class="fas fa-brain text-white text-2xl"></i></div>
+            <h3 class="font-display text-2xl font-bold mb-2" style="color:var(--fg)">Siap Mengerjakan Kuis?</h3>
+            <p class="text-sm mb-1" style="color:var(--muted)">10 soal pilihan ganda seputar materi PKN SMP</p>
+            <div class="flex flex-wrap justify-center gap-4 text-xs mb-6 mt-3" style="color:var(--muted)">
+                <span><i class="fas fa-clock mr-1 text-red-500"></i>10 menit</span>
+                <span><i class="fas fa-list-check mr-1 text-amber-500"></i>10 soal</span>
+                <span><i class="fas fa-star mr-1 text-emerald-500"></i>Skor maks 100</span>
+            </div>
+            <button onclick="mulaiKuis()" class="inline-flex items-center gap-2 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-800 hover:to-red-700 text-white font-bold px-10 py-4 rounded-2xl transition-all hover:scale-105 shadow-lg shadow-red-600/30">
+                <i class="fas fa-play"></i> Mulai Kuis
+            </button>
+        </div>
+
+        <!-- Soal -->
+        <div id="quizPlay" class="hidden">
+            <div class="flex items-center justify-between mb-4 p-4 rounded-2xl" style="background:var(--card);border:1px solid var(--border)">
+                <div class="flex items-center gap-2"><span class="text-sm" style="color:var(--muted)">Soal</span><span id="qNum" class="text-lg font-bold text-red-600">1/10</span></div>
+                <div class="flex items-center gap-2"><i class="fas fa-clock text-red-500"></i><span id="qTimer" class="font-mono font-bold text-lg" style="color:var(--fg)">10:00</span></div>
+            </div>
+            <div class="w-full h-2 rounded-full mb-5 overflow-hidden" style="background:var(--border)"><div id="qBar" class="h-full bg-gradient-to-r from-red-500 to-amber-500 rounded-full transition-all duration-500" style="width:10%"></div></div>
+            <div class="p-5 sm:p-7 rounded-3xl border" style="background:var(--card);border-color:var(--border)">
+                <p id="qText" class="text-base sm:text-lg font-semibold mb-5 leading-relaxed" style="color:var(--fg)"></p>
+                <div id="qOpts" class="space-y-3"></div>
+                <div class="mt-5 flex justify-between items-center flex-wrap gap-3">
+                    <div id="qFeedback" class="text-sm"></div>
+                    <button id="qNext" onclick="nextQ()" class="hidden items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm">Selanjutnya <i class="fas fa-arrow-right text-xs"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hasil -->
+        <div id="quizEnd" class="hidden text-center p-8 rounded-3xl border-2" style="background:var(--card);border-color:var(--border)">
+            <div class="relative w-36 h-36 mx-auto mb-5">
+                <svg class="w-full h-full" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="7"/>
+                    <circle id="endRing" cx="60" cy="60" r="52" fill="none" stroke="url(#grd)" stroke-width="7" stroke-linecap="round" class="ring-circle" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+                    <defs><linearGradient id="grd" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center"><span id="endScore" class="text-3xl font-bold" style="color:var(--fg)">0</span></div>
+            </div>
+            <h3 id="endTitle" class="font-display text-2xl font-bold mb-1" style="color:var(--fg)"></h3>
+            <p id="endDesc" class="mb-5 text-sm" style="color:var(--muted)"></p>
+            <div id="endStats" class="flex justify-center gap-6 mb-7 text-sm"></div>
+            <button onclick="ulangiKuis()" class="inline-flex items-center gap-2 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-800 hover:to-red-700 text-white font-bold px-8 py-4 rounded-2xl transition-all hover:scale-105 shadow-lg shadow-red-600/30">
+                <i class="fas fa-redo"></i> Ulangi Kuis
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ========== COCOKKAN ========== -->
+<section id="cocokkan" class="py-16 lg:py-24" style="background:var(--bg)">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 anim-reveal">
+            <span class="inline-block bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Permainan Edukasi</span>
+            <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4" style="color:var(--fg)">Cocokkan Pasangan</h2>
+            <p class="text-lg max-w-2xl mx-auto" style="color:var(--muted)">Pilih pasangan yang tepat antara istilah PKN dan penjelasannya</p>
+        </div>
+        <div class="anim-reveal">
+            <div class="p-5 sm:p-7 rounded-3xl border" style="background:var(--card);border-color:var(--border)">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3"><span class="text-sm font-semibold" style="color:var(--muted)">Skor:</span><span id="matchScore" class="text-xl font-bold text-red-600">0</span><span class="text-sm" style="color:var(--muted)">/ 8</span></div>
+                    <button onclick="resetMatch()" class="text-sm font-semibold text-red-600 hover:text-red-700 transition-colors"><i class="fas fa-redo mr-1"></i>Reset</button>
+                </div>
+                <div id="matchBox" class="grid sm:grid-cols-2 gap-3"></div>
+                <div id="matchDone" class="hidden text-center mt-6 p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                    <i class="fas fa-check-circle text-emerald-500 text-3xl mb-2"></i>
+                    <h4 class="font-bold text-emerald-700 dark:text-emerald-400">Semua Pasangan Benar!</h4>
+                    <p class="text-sm text-emerald-600 dark:text-emerald-500 mt-1">Kamu berhasil mencocokkan semua istilah dengan tepat.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== GLOSARIUM ========== -->
+<section id="glosarium" class="py-16 lg:py-24" style="background:var(--bg)">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 anim-reveal">
+            <span class="inline-block bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">Kamus Istilah</span>
+            <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4" style="color:var(--fg)">Glosarium PKN</h2>
+            <p class="text-lg max-w-2xl mx-auto" style="color:var(--muted)">Daftar istilah penting dalam mata pelajaran PKN beserta pengertiannya</p>
+        </div>
+        <div class="max-w-md mx-auto mb-7 anim-reveal">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--muted)"></i>
+                <input id="glosSearch" type="text" placeholder="Cari istilah..." class="w-full pl-11 pr-4 py-3 rounded-xl border-2 text-sm focus:outline-none focus:border-amber-500 transition-colors" style="background:var(--card);border-color:var(--border);color:var(--fg)">
+            </div>
+        </div>
+        <div id="glosBox" class="space-y-2.5 anim-reveal"></div>
+    </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="relative overflow-hidden" style="background:linear-gradient(160deg,#450a0a,#7f1d1d,#991b1b)">
+    <div class="absolute inset-0 opacity-[0.04]" style="background-image:url('data:image/svg+xml,%3Csvg width=&quot;40&quot; height=&quot;40&quot; viewBox=&quot;0 0 40 40&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;%23fff&quot; fill-opacity=&quot;1&quot;%3E%3Cpath d=&quot;M20 20.5V18H0v-2h20v-2l2 3.5-2 3z&quot;/%3E%3C/g%3E%3C/svg%3E');"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 relative z-10">
+        <div class="grid md:grid-cols-3 gap-10">
+            <div class="text-white">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center"><i class="fas fa-landmark text-amber-400 text-sm"></i></div>
+                    <span class="font-bold text-lg">PKN SMP</span>
+                </div>
+                <p class="text-white/60 text-sm leading-relaxed">Media pembelajaran interaktif untuk mata pelajaran Pendidikan Kewarganegaraan jenjang SMP. Didesain agar proses belajar lebih menyenangkan dan bermakna.</p>
+            </div>
+            <div class="text-white">
+                <h4 class="font-bold mb-4">Navigasi Cepat</h4>
+                <div class="grid grid-cols-2 gap-2 text-sm text-white/60">
+                    <a href="#hero" class="hover:text-amber-400 transition-colors">Beranda</a>
+                    <a href="#materi" class="hover:text-amber-400 transition-colors">Materi</a>
+                    <a href="#timeline" class="hover:text-amber-400 transition-colors">Timeline</a>
+                    <a href="#kuis" class="hover:text-amber-400 transition-colors">Kuis</a>
+                    <a href="#cocokkan" class="hover:text-amber-400 transition-colors">Cocokkan</a>
+                    <a href="#glosarium" class="hover:text-amber-400 transition-colors">Glosarium</a>
+                </div>
+            </div>
+            <div class="text-white">
+                <h4 class="font-bold mb-4">Referensi</h4>
+                <ul class="space-y-2 text-sm text-white/60">
+                    <li><i class="fas fa-book-open mr-2 text-amber-400"></i>Buku PKN SMP Kelas 7–9</li>
+                    <li><i class="fas fa-gavel mr-2 text-amber-400"></i>UUD NRI Tahun 1945</li>
+                    <li><i class="fas fa-landmark mr-2 text-amber-400"></i>Peraturan Perundang-undangan</li>
+                    <li><i class="fas fa-globe mr-2 text-amber-400"></i>Portal Kemendikbudristek</li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-white/15 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/40 text-sm">
+            <p>2024 Media Pembelajaran PKN SMP — Tujuan Edukasi</p>
+            <p><i class="fas fa-flag mr-1"></i>Merdeka Belajar</p>
+        </div>
+    </div>
+</footer>
+
+<!-- ========== JAVASCRIPT ========== -->
+<script>
+// ===== DATA MATERI =====
+var materi = [
+    {
+        id:1, bab:"Bab 1", judul:"Pancasila sebagai Dasar Negara",
+        ikon:"fas fa-star", warna:"from-red-500 to-red-700",
+        ringkasan:"Memahami Pancasila sebagai dasar negara dan pandangan hidup bangsa",
+        isi:'<h4 class="font-bold text-lg mb-3" style="color:var(--fg)">A. Pengertian Pancasila</h4><p class="mb-4 leading-relaxed" style="color:var(--muted)">Kata <strong>Pancasila</strong> berasal dari bahasa Sanskerta: <em>panca</em> berarti lima dan <em>sila</em> berarti prinsip atau asas. Pancasila adalah dasar negara Republik Indonesia yang terdiri dari lima sila sebagai pedoman hidup berbangsa dan bernegara.</p><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">B. Sejarah Perumusan</h4><ul class="list-disc list-inside mb-4 space-y-1 text-sm" style="color:var(--muted)"><li><strong>29 Mei 1945</strong> — Moh. Yamin menyampaikan usulan dasar negara</li><li><strong>31 Mei 1945</strong> — Soepomo mengusulkan dasar negara berintikan kekeluargaan</li><li><strong>1 Juni 1945</strong> — Ir. Soekarno menyampaikan pidato tentang Pancasila (Hari Lahir Pancasila)</li><li><strong>22 Juni 1945</strong> — Terbentuk Panitia Sembilan yang merumuskan Piagam Jakarta</li><li><strong>18 Agustus 1945</strong> — PPKI mengesahkan Pancasila secara resmi dalam UUD 1945</li></ul><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">C. Lima Sila Pancasila</h4><div class="space-y-2 mb-4"><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-red-600">Sila 1 — Ketuhanan Yang Maha Esa</p><p class="text-sm mt-1" style="color:var(--muted)">Mengakui Tuhan sebagai pencipta alam semesta. Indonesia menjamin kebebasan beragama.</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-red-600">Sila 2 — Kemanusiaan yang Adil dan Beradab</p><p class="text-sm mt-1" style="color:var(--muted)">Mengakui derajat dan hak asasi setiap manusia yang harus diperlakukan secara adil.</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-red-600">Sila 3 — Persatuan Indonesia</p><p class="text-sm mt-1" style="color:var(--muted)">Menekankan persatuan seluruh bangsa dalam wadah NKRI yang terdiri dari berbagai suku.</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-red-600">Sila 4 — Kerakyatan yang Dipimpin oleh Hikmat Kebijaksanaan dalam Permusyawaratan/Perwakilan</p><p class="text-sm mt-1" style="color:var(--muted)">Mengutamakan musyawarah mufakat dalam setiap pengambilan keputusan bersama.</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-red-600">Sila 5 — Keadilan Sosial bagi Seluruh Rakyat Indonesia</p><p class="text-sm mt-1" style="color:var(--muted)">Mewujudkan keadilan yang merata bagi seluruh rakyat, baik material maupun spiritual.</p></div></div><div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"><p class="text-sm font-semibold text-amber-800 dark:text-amber-400"><i class="fas fa-lightbulb mr-2"></i>Tahukah Kamu?</p><p class="text-sm mt-1 text-amber-700 dark:text-amber-500">Lambang Garuda Pancasila dirancang oleh Sultan Hamid II dari Pontianak, kemudian disempurnakan oleh Soekarno. Garuda menggenggam sebuah pita bertuliskan "Bhinneka Tunggal Ika".</p></div>'
+    },
+    {
+        id:2, bab:"Bab 2", judul:"UUD NRI Tahun 1945",
+        ikon:"fas fa-scroll", warna:"from-amber-500 to-amber-700",
+        ringkasan:"Mengenal struktur, fungsi, dan kedudukan UUD 1945 dalam ketatanegaraan",
+        isi:'<h4 class="font-bold text-lg mb-3" style="color:var(--fg)">A. Kedudukan UUD 1945</h4><p class="mb-4 leading-relaxed" style="color:var(--muted)">UUD NRI Tahun 1945 adalah <strong>hukum dasar tertulis tertinggi</strong> di Indonesia. Ditetapkan pada <strong>18 Agustus 1945</strong> oleh PPKI. Semua peraturan perundang-undangan tidak boleh bertentangan dengan UUD 1945.</p><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">B. Struktur UUD 1945</h4><ul class="list-disc list-inside mb-4 space-y-1 text-sm" style="color:var(--muted)"><li><strong>Pembukaan</strong> (Alinea I–IV) — Berisi jiwa dan semangat bangsa, tidak dapat diubah</li><li><strong>Batang Tubuh</strong> (Pasal 1–37) — Ketentuan dasar negara, dapat diamandemen</li><li><strong>Aturan Peralihan</strong> (Pasal I–III) — Ketentuan sementara saat transisi</li><li><strong>Aturan Tambahan</strong> (Pasal I–II) — Cara mengubah UUD</li></ul><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">C. Alinea Keempat (Tujuan Negara)</h4><div class="p-4 rounded-xl mb-4 border-l-4 border-red-500" style="background:var(--bg)"><p class="text-sm italic leading-relaxed" style="color:var(--muted)">"Kemudian daripada itu untuk membentuk suatu pemerintah negara Indonesia yang melindungi segenap bangsa Indonesia dan seluruh tumpah darah Indonesia dan untuk memajukan kesejahteraan umum, mencerdaskan kehidupan bangsa, dan ikut melaksanakan ketertiban dunia yang berdasarkan kemerdekaan, perdamaian abadi dan keadilan sosial..."</p></div><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">D. Fungsi UUD 1945</h4><ol class="list-decimal list-inside mb-4 space-y-1 text-sm" style="color:var(--muted)"><li>Hukum dasar tertulis (<em>written constitution</em>)</li><li>Sumber dari segala sumber hukum</li><li>Pedoman penyelenggaraan negara</li><li>Alat pemersatu bangsa</li><li>Simbol kedaulatan rakyat</li></ol><div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"><p class="text-sm font-semibold text-amber-800 dark:text-amber-400"><i class="fas fa-lightbulb mr-2"></i>Tahukah Kamu?</p><p class="text-sm mt-1 text-amber-700 dark:text-amber-500">UUD 1945 mengalami 4 kali perubahan (amandemen) pada tahun 1999, 2000, 2001, dan 2002 melalui Sidang Tahunan MPR. Amandemen dilakukan untuk menyesuaikan tata kelola negara dengan prinsip demokrasi.</p></div>'
+    },
+    {
+        id:3, bab:"Bab 3", judul:"Bhinneka Tunggal Ika",
+        ikon:"fas fa-people-group", warna:"from-emerald-500 to-emerald-700",
+        ringkasan:"Menghayati keberagaman bangsa sebagai kekuatan dan kekayaan Indonesia",
+        isi:'<h4 class="font-bold text-lg mb-3" style="color:var(--fg)">A. Pengertian</h4><p class="mb-4 leading-relaxed" style="color:var(--muted)"><strong>Bhinneka Tunggal Ika</strong> berasal dari bahasa Jawa Kuno yang berarti "Berbeda-beda tetapi tetap satu". Diambil dari kitab <em>Sutasoma</em> karya Mpu Tantular, tercantum pada lambang negara Garuda Pancasila yang digenggam oleh kedua cakar Garuda.</p><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">B. Bentuk Keberagaman Indonesia</h4><div class="grid sm:grid-cols-2 gap-3 mb-4"><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-emerald-600"><i class="fas fa-language mr-1"></i>Suku Bangsa</p><p class="text-sm mt-1" style="color:var(--muted)">Lebih dari 1.300 suku: Jawa, Sunda, Batak, Minang, Dayak, Papua, dan lainnya.</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-emerald-600"><i class="fas fa-mosque mr-1"></i>Agama & Kepercayaan</p><p class="text-sm mt-1" style="color:var(--muted)">6 agama diakui: Islam, Kristen, Katolik, Hindu, Buddha, Konghucu.</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-emerald-600"><i class="fas fa-map mr-1"></i>Wilayah</p><p class="text-sm mt-1" style="color:var(--muted)">17.508 pulau, 34 provinsi, dari Sabang sampai Merauke.</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-emerald-600"><i class="fas fa-masks-theater mr-1"></i>Budaya</p><p class="text-sm mt-1" style="color:var(--muted)">Ragam bahasa (700+), seni, tradisi, kuliner, pakaian adat.</p></div></div><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">C. Sikap terhadap Keberagaman</h4><ul class="list-disc list-inside mb-4 space-y-1 text-sm" style="color:var(--muted)"><li>Menghormati perbedaan agama, suku, dan budaya</li><li>Tidak memaksakan kepercayaan kepada orang lain</li><li>Menghindari sikap diskriminatif dan ujaran kebencian (SARA)</li><li>Melakukan kerja sama lintas budaya</li><li>Menumbuhkan toleransi dalam kehidupan sehari-hari</li></ul><div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800"><p class="text-sm font-semibold text-emerald-800 dark:text-emerald-400"><i class="fas fa-lightbulb mr-2"></i>Tahukah Kamu?</p><p class="text-sm mt-1 text-emerald-700 dark:text-emerald-500">Indonesia memiliki lebih dari 700 bahasa daerah, menjadikannya negara dengan keberagaman bahasa terbesar kedua di dunia setelah Papua Nugini.</p></div>'
+    },
+    {
+        id:4, bab:"Bab 4", judul:"Sistem Pemerintahan Daerah",
+        ikon:"fas fa-building-columns", warna:"from-sky-500 to-sky-700",
+        ringkasan:"Memahami otonomi daerah dan pembagian kekuasaan pemerintahan",
+        isi:'<h4 class="font-bold text-lg mb-3" style="color:var(--fg)">A. Otonomi Daerah</h4><p class="mb-4 leading-relaxed" style="color:var(--muted)">Otonomi daerah adalah hak, wewenang, dan kewajiban daerah untuk mengatur dan mengurus urusan pemerintahannya sendiri. Diatur dalam <strong>UU No. 23 Tahun 2014</strong> tentang Pemerintahan Daerah.</p><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">B. Pembagian Daerah</h4><ul class="list-disc list-inside mb-4 space-y-1 text-sm" style="color:var(--muted)"><li><strong>Provinsi</strong> — Dipimpin Gubernur & Wakil Gubernur</li><li><strong>Kabupaten</strong> — Dipimpin Bupati & Wakil Bupati</li><li><strong>Kota</strong> — Dipimpin Walikota & Wakil Walikota</li></ul><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">C. Urusan Pemerintahan Daerah</h4><div class="space-y-2 mb-4"><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-sky-600">Urusan Wajib</p><p class="text-sm mt-1" style="color:var(--muted)">Pendidikan, kesehatan, pekerjaan umum, penataan ruang, perumahan, ketenteraman masyarakat</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-sky-600">Urusan Pilihan</p><p class="text-sm mt-1" style="color:var(--muted)">Disesuaikan dengan potensi dan kebutuhan masing-masing daerah</p></div></div><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">D. Pemilihan Kepala Daerah (Pilkada)</h4><p class="mb-4 leading-relaxed text-sm" style="color:var(--muted)">Kepala daerah dipilih langsung oleh rakyat setiap 5 tahun. Syarat: WNI, berusia minimal 30 tahun, tidak sedang dicabut hak pilihnya, dan memenuhi persyaratan administratif lainnya.</p>'
+    },
+    {
+        id:5, bab:"Bab 5", judul:"Hak Asasi Manusia",
+        ikon:"fas fa-hand-fist", warna:"from-purple-500 to-purple-700",
+        ringkasan:"Mengenal, memahami, dan menegakkan hak asasi manusia di Indonesia",
+        isi:'<h4 class="font-bold text-lg mb-3" style="color:var(--fg)">A. Pengertian HAM</h4><p class="mb-4 leading-relaxed" style="color:var(--muted)">Hak Asasi Manusia (HAM) adalah hak-hak dasar yang <strong>melekat pada diri manusia sebagai anugerah Tuhan</strong> yang harus dihormati, dijunjung tinggi, dan dilindungi oleh negara.</p><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">B. Klasifikasi HAM</h4><div class="space-y-2 mb-4"><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-purple-600">Hak Hidup</p><p class="text-sm mt-1" style="color:var(--muted)">Hak atas hidup, martabat, kebebasan pribadi, dan rasa aman</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-purple-600">Hak Ekonomi</p><p class="text-sm mt-1" style="color:var(--muted)">Hak atas pekerjaan, pendapatan layak, dan kepemilikan (property)</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-purple-600">Hak Sosial & Budaya</p><p class="text-sm mt-1" style="color:var(--muted)">Hak atas pendidikan, kesehatan, dan partisipasi dalam kebudayaan</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-purple-600">Hak Politik</p><p class="text-sm mt-1" style="color:var(--muted)">Hak memilih & dipilih, berpendapat, berkumpul, dan berserikat</p></div></div><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">C. Dasar Hukum HAM di Indonesia</h4><ul class="list-disc list-inside mb-4 space-y-1 text-sm" style="color:var(--muted)"><li>UUD 1945 Pasal 27–34</li><li>UU No. 39 Tahun 1999 tentang HAM</li><li>UU No. 26 Tahun 2000 tentang Pengadilan HAM</li><li>Deklarasi Universal HAM (DUHAM) 1948</li></ul><div class="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800"><p class="text-sm font-semibold text-purple-800 dark:text-purple-400"><i class="fas fa-lightbulb mr-2"></i>Tahukah Kamu?</p><p class="text-sm mt-1 text-purple-700 dark:text-purple-500">Komnas HAM (Komisi Nasional HAM) dibentuk berdasarkan UU No. 39 Tahun 1999. Tugasnya mengawasi pelaksanaan HAM, menangani pengaduan pelanggaran HAM, dan memberikan rekomendasi kepada pemerintah.</p></div>'
+    },
+    {
+        id:6, bab:"Bab 6", judul:"Demokrasi di Indonesia",
+        ikon:"fas fa-check-to-slot", warna:"from-teal-500 to-teal-700",
+        ringkasan:"Memahami prinsip demokrasi Pancasila dan partisipasi warga negara",
+        isi:'<h4 class="font-bold text-lg mb-3" style="color:var(--fg)">A. Pengertian Demokrasi</h4><p class="mb-4 leading-relaxed" style="color:var(--muted)">Demokrasi berasal dari bahasa Yunani: <strong>demos</strong> (rakyat) dan <strong>kratos</strong> (kekuasaan), artinya pemerintahan dari rakyat, oleh rakyat, dan untuk rakyat.</p><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">B. Prinsip Demokrasi Pancasila</h4><ul class="list-disc list-inside mb-4 space-y-1 text-sm" style="color:var(--muted)"><li>Musyawarah mufakat (berdasarkan Sila ke-4)</li><li>Tidak memaksakan kehendak kepada orang lain</li><li>Menghormati hak minoritas</li><li>Mengutamakan kepentingan bersama di atas pribadi</li><li>Keputusan melalui perwakilan rakyat</li></ul><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">C. Pemilu (Pemilihan Umum)</h4><p class="mb-4 leading-relaxed text-sm" style="color:var(--muted)">Pemilu diselenggarakan dengan asas <strong>LUBER JURDIL</strong>: Langsung, Umum, Bebas, Rahasia, Jujur, dan Adil. Diselenggarakan oleh KPU (Komisi Pemilihan Umum) dan diawasi oleh Bawaslu.</p><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">D. Partisipasi Warga Negara</h4><div class="grid sm:grid-cols-2 gap-2 mb-4"><div class="p-3 rounded-xl text-sm" style="background:var(--bg);border:1px solid var(--border);color:var(--muted)"><i class="fas fa-vote-yea text-teal-500 mr-1"></i>Menggunakan hak pilih</div><div class="p-3 rounded-xl text-sm" style="background:var(--bg);border:1px solid var(--border);color:var(--muted)"><i class="fas fa-comments text-teal-500 mr-1"></i>Menyampaikan aspirasi</div><div class="p-3 rounded-xl text-sm" style="background:var(--bg);border:1px solid var(--border);color:var(--muted)"><i class="fas fa-hands-helping text-teal-500 mr-1"></i>Gotong royong</div><div class="p-3 rounded-xl text-sm" style="background:var(--bg);border:1px solid var(--border);color:var(--muted)"><i class="fas fa-balance-scale text-teal-500 mr-1"></i>Menjaga ketertiban</div></div>'
+    },
+    {
+        id:7, bab:"Bab 7", judul:"Hak dan Kewajiban Warga Negara",
+        ikon:"fas fa-handshake", warna:"from-orange-500 to-orange-700",
+        ringkasan:"Memahami keseimbangan antara hak dan kewajiban warga negara",
+        isi:'<h4 class="font-bold text-lg mb-3" style="color:var(--fg)">A. Hak Warga Negara</h4><ul class="list-disc list-inside mb-4 space-y-1 text-sm" style="color:var(--muted)"><li>Hak atas pendidikan (Pasal 31 UUD 1945)</li><li>Hak atas pekerjaan dan penghidupan layak (Pasal 27)</li><li>Hak memeluk agama dan beribadah (Pasal 29)</li><li>Hak atas rasa aman dan perlindungan hukum</li><li>Hak berpartisipasi dalam pemerintahan</li><li>Hak mendapat pelayanan kesehatan dasar</li></ul><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">B. Kewajiban Warga Negara</h4><ul class="list-disc list-inside mb-4 space-y-1 text-sm" style="color:var(--muted)"><li>Taati hukum dan peraturan yang berlaku</li><li>Bela negara (Pasal 30 UUD 1945)</li><li>Bayar pajak tepat waktu</li><li>Hormati hak orang lain</li><li>Ikut serta dalam pertahanan dan keamanan</li><li>Jaga persatuan dan kesatuan bangsa</li></ul><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">C. Keseimbangan Hak dan Kewajiban</h4><p class="mb-4 leading-relaxed text-sm" style="color:var(--muted)">Hak dan kewajiban adalah dua sisi mata uang yang tidak terpisahkan. Setiap hak harus diimbangi kewajiban. Jika semua warga negara hanya menuntut hak tanpa memenuhi kewajiban, kehidupan bernegara akan kacau.</p><div class="p-4 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"><p class="text-sm font-semibold text-orange-800 dark:text-orange-400"><i class="fas fa-lightbulb mr-2"></i>Tahukah Kamu?</p><p class="text-sm mt-1 text-orange-700 dark:text-orange-500">Warga Negara Indonesia (WNI) berbeda dengan Penduduk. WNI adalah orang yang secara hukum menjadi warga negara, sedangkan Penduduk adalah siapa saja yang bertempat tinggal di wilayah Indonesia (termasuk WNA).</p></div>'
+    },
+    {
+        id:8, bab:"Bab 8", judul:"Pertahanan dan Keamanan Negara",
+        ikon:"fas fa-shield-halved", warna:"from-slate-600 to-slate-800",
+        ringkasan:"Memahami sistem pertahanan negara dan peran warga negara dalam bela negara",
+        isi:'<h4 class="font-bold text-lg mb-3" style="color:var(--fg)">A. Sistem Pertahanan Semesta</h4><p class="mb-4 leading-relaxed" style="color:var(--muted)">Indonesia menerapkan <strong>Sishankamrata</strong> (Sistem Pertahanan Semesta) — sistem yang melibatkan seluruh warga negara, wilayah, dan sumber daya nasional. Diatur dalam <strong>UU No. 3 Tahun 2002</strong>.</p><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">B. Komponen Pertahanan</h4><div class="space-y-2 mb-4"><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-slate-500 dark:text-slate-400">Komponen Utama</p><p class="text-sm mt-1" style="color:var(--muted)">TNI (Tentara Nasional Indonesia) — AD, AL, AU</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-slate-500 dark:text-slate-400">Komponen Cadangan</p><p class="text-sm mt-1" style="color:var(--muted)">Warga negara yang telah dilatih sebagai cadangan kekuatan</p></div><div class="p-3 rounded-xl" style="background:var(--bg);border:1px solid var(--border)"><p class="font-semibold text-sm text-slate-500 dark:text-slate-400">Komponen Pendukung</p><p class="text-sm mt-1" style="color:var(--muted)">Sumber daya nasional: ekonomi, pendidikan, teknologi</p></div></div><h4 class="font-bold text-lg mb-3" style="color:var(--fg)">C. Bentuk Bela Negara</h4><p class="mb-4 leading-relaxed text-sm" style="color:var(--muted)">Bela negara bukan hanya berperang. Bentuknya bisa melalui: menempuh pendidikan dengan baik, bekerja keras, menghargai budaya, berkontribusi positif bagi bangsa, meningkatkan ketahanan diri dan keluarga, serta menjaga persatuan.</p>'
+    }
+];
+
+// ===== DATA TIMELINE =====
+var timeline = [
+    {tahun:"1908", judul:"Budi Utomo", desc:"Organisasi pergerakan nasional pertama, didirikan Dr. Wahidin Sudirohusodo. Menandai awal kebangkitan nasional."},
+    {tahun:"1912", judul:"Sarekat Islam", desc:"Organisasi massal terbesar saat itu yang menyatukan rakyat melalui gerakan ekonomi dan sosial kebangsaan."},
+    {tahun:"1928", judul:"Sumpah Pemuda", desc:"Mengikrarkan satu nusa, satu bangsa, dan satu bahasa: Indonesia. Peristiwa sejarah penyatuan bangsa."},
+    {tahun:"1942", judul:"Pendudukan Jepang", desc:"Jepang menduduki Indonesia 3,5 tahun. Membawa penderitaan namun memicu semangat kemerdekaan."},
+    {tahun:"1945", judul:"Proklamasi Kemerdekaan", desc:"Ir. Soekarno dan Mohammad Hatta memproklamasikan kemerdekaan pada 17 Agustus 1945."},
+    {tahun:"1945", judul:"Pengesahan UUD 1945", desc:"PPKI mengesahkan UUD 1945 sebagai konstitusi negara pada 18 Agustus 1945."},
+    {tahun:"1949", judul:"Pengakuan Kedaulatan", desc:"Belanda mengakui kedaulatan Indonesia pada 27 Desember 1949 melalui Konferensi Meja Bundar."},
+    {tahun:"1955", judul:"Pemilu Pertama", desc:"Indonesia menyelenggarakan pemilihan umum pertama, diikuti 29 partai politik dan 43 juta pemilih."},
+    {tahun:"1998", judul:"Reformasi", desc:"Gerakan mahasiswa menjatuhkan rezim Orde Baru, membawa Indonesia ke era demokrasi terbuka."},
+    {tahun:"2002", judul:"Amandemen UUD Selesai", desc:"Perubahan keempat UUD 1945 selesai, pembaharuan konstitusi secara menyeluruh selesai."}
+];
+
+// ===== DATA KUIS =====
+var kuisData = [
+    {q:"Siapa yang menyampaikan pidato tentang dasar negara pada 1 Juni 1945?", o:["Moh. Yamin","Ir. Soekarno","Soepomo","Mohammad Hatta"], a:1, e:"Ir. Soekarno menyampaikan pidato dasar negara pada 1 Juni 1945 dalam sidang BPUPKI. Tanggal ini diperingati sebagai Hari Lahir Pancasila."},
+    {q:"Alinea keempat Pembukaan UUD 1945 berisi tentang...", o:["Latar belakang perjuangan","Tujuan negara Indonesia","Dasar negara Pancasila","Proklamasi kemerdekaan"], a:1, e:"Alinea keempat memuat tujuan negara: melindungi bangsa, memajukan kesejahteraan, mencerdaskan kehidupan bangsa, dan ikut ketertiban dunia."},
+    {q:"Semboyan 'Bhinneka Tunggal Ika' diambil dari kitab...", o:["Negarakertagama","Sutasoma","Pararaton","Arjunawiwaha"], a:1, e:"Bhinneka Tunggal Ika berasal dari kitab Sutasoma karya Mpu Tantular, artinya 'Berbeda-beda tetapi tetap satu'."},
+    {q:"Lembaga pengawas pelaksanaan HAM di Indonesia adalah...", o:["KPK","Komnas HAM","KY","DPR"], a:1, e:"Komnas HAM dibentuk berdasarkan UU No. 39 Tahun 1999 untuk mengawasi pelaksanaan HAM di Indonesia."},
+    {q:"Sistem pertahanan yang melibatkan seluruh warga negara disebut...", o:["Wajib Militer","Sishankamrata","Bela Negara","Hankamrata"], a:1, e:"Sishankamrata (Sistem Pertahanan Semesta) melibatkan seluruh warga negara, wilayah, dan sumber daya nasional."},
+    {q:"Dalam prinsip LUBER JURDIL, huruf 'R' berarti...", o:["Realita","Rahasia","Responsif","Reguler"], a:1, e:"LUBER JURDIL: Langsung, Umum, Bebas, Rahasia, Jujur, Adil. Rahasia artinya suara pemilih tidak diketahui pihak lain."},
+    {q:"Lembaga penyelenggara pemilihan umum di Indonesia adalah...", o:["Bawaslu","DPR","KPU","Presiden"], a:2, e:"KPU (Komisi Pemilihan Umum) bertugas menyelenggarakan pemilu sesuai UU No. 7 Tahun 2017."},
+    {q:"Hak atas pendidikan diatur dalam UUD 1945 pasal...", o:["Pasal 27","Pasal 28","Pasal 29","Pasal 31"], a:3, e:"Pasal 31 UUD 1945 mengatur bahwa setiap warga negara berhak mendapat pendidikan dan pemerintah wajib membiayainya."},
+    {q:"BPUPKI dibentuk pada tanggal...", o:["1 Maret 1945","29 Mei 1945","17 Agustus 1945","18 Agustus 1945"], a:0, e:"BPUPKI (Badan Penyelidik Usaha-usaha Persiapan Kemerdekaan Indonesia) dibentuk Jepang pada 1 Maret 1945."},
+    {q:"Jumlah sila dalam Pancasila adalah...", o:["3","4","5","7"], a:2, e:"Pancasila terdiri dari 5 sila. 'Panca' berarti lima, 'Sila' berarti prinsip atau asas."}
+];
+
+// ===== DATA MATCH =====
+var matchData = [
+    {istilah:"Pancasila", penjelasan:"Dasar negara Indonesia dengan 5 sila"},
+    {istilah:"UUD 1945", penjelasan:"Konstitusi tertinggi negara Indonesia"},
+    {istilah:"Bhinneka Tunggal Ika", penjelasan:"Semboyan: berbeda tetapi satu"},
+    {istilah:"Komnas HAM", penjelasan:"Lembaga pengawas HAM Indonesia"},
+    {istilah:"Sishankamrata", penjelasan:"Sistem pertahanan seluruh rakyat"},
+    {istilah:"KPU", penjelasan:"Penyelenggara pemilihan umum"},
+    {istilah:"BPUPKI", penjelasan:"Badan persiapan kemerdekaan 1945"},
+    {istilah:"Otonomi Daerah", penjelasan:"Hak daerah urus pemerintahan sendiri"}
+];
+
+// ===== DATA GLOSARIUM =====
+var glosData = [
+    {istilah:"Pancasila", def:"Dasar negara RI yang terdiri dari lima sila, sebagai pandangan hidup bangsa Indonesia."},
+    {istilah:"UUD 1945", def:"Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, hukum dasar tertulis tertinggi."},
+    {istilah:"BPUPKI", def:"Badan Penyelidik Usaha-usaha Persiapan Kemerdekaan Indonesia, dibentuk 1 Maret 1945."},
+    {istilah:"PPKI", def:"Panitia Persiapan Kemerdekaan Indonesia yang merumuskan kemerdekaan 18 Agustus 1945."},
+    {istilah:"HAM", def:"Hak Asasi Manusia — hak dasar yang melekat pada diri manusia sebagai anugerah Tuhan."},
+    {istilah:"Demokrasi", def:"Sistem pemerintahan dari rakyat, oleh rakyat, dan untuk rakyat."},
+    {istilah:"Otonomi Daerah", def:"Hak, wewenang, dan kewajiban daerah mengatur urusan pemerintahannya sendiri."},
+    {istilah:"Sishankamrata", def:"Sistem Pertahanan Semesta — melibatkan seluruh warga negara dalam pertahanan."},
+    {istilah:"Bela Negara", def:"Segala usaha mempertahankan kemerdekaan, kedaulatan, dan keutuhan NKRI."},
+    {istilah:"LUBER JURDIL", def:"Prinsip pemilu: Langsung, Umum, Bebas, Rahasia, Jujur, dan Adil."},
+    {istilah:"NKRI", def:"Negara Kesatuan Republik Indonesia — bentuk negara berdaulat yang utuh."},
+    {istilah:"WNI", def:"Warga Negara Indonesia — orang yang secara hukum menjadi warga negara berdasarkan UU."},
+    {istilah:"KPU", def:"Komisi Pemilihan Umum — lembaga penyelenggara pemilihan umum di Indonesia."},
+    {istilah:"Gotong Royong", def:"Sifat kerja sama tolong-menolong dalam masyarakat Indonesia sebagai budaya asli bangsa."},
+    {istilah:"Musyawarah", def:"Pembahasan bersama untuk mencapai mufakat dalam pengambilan keputusan."},
+    {istilah:"Pilkada", def:"Pemilihan Kepala Daerah secara langsung oleh rakyat setiap 5 tahun sekali."}
+];
+
+
+// ===== FUNGSI UTILITAS =====
+function toast(msg, tipe) {
+    var c = document.getElementById('toasts');
+    var warna = {success:'bg-emerald-600 text-white', error:'bg-red-600 text-white', info:'bg-sky-600 text-white', warning:'bg-amber-500 text-stone-900'};
+    var ikon = {success:'fa-check-circle', error:'fa-times-circle', info:'fa-info-circle', warning:'fa-exclamation-triangle'};
+    var d = document.createElement('div');
+    d.className = 'toast-msg ' + (warna[tipe]||warna.info) + ' px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium';
+    d.innerHTML = '<i class="fas '+(ikon[tipe]||ikon.info)+'"></i>' + msg;
+    c.appendChild(d);
+    setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 3000);
+}
+
+// ===== DARK MODE =====
+var themeBtn = document.getElementById('themeBtn');
+var themeIcon = document.getElementById('themeIcon');
+function setTheme(dark) {
+    document.documentElement.classList.toggle('dark', dark);
+    themeIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+    try { localStorage.setItem('pknDark', dark ? '1' : '0'); } catch(e){}
+}
+themeBtn.onclick = function() { setTheme(!document.documentElement.classList.contains('dark')); };
+if (localStorage.getItem('pknDark') === '1' || (!localStorage.getItem('pknDark') && window.matchMedia('(prefers-color-scheme:dark)').matches)) setTheme(true);
+
+// ===== HAMBURGER =====
+var menuBtn = document.getElementById('menuBtn');
+var mobMenu = document.getElementById('mobMenu');
+menuBtn.onclick = function() { mobMenu.classList.toggle('hidden'); };
+document.querySelectorAll('.mob-link').forEach(function(a){ a.onclick = function(){ mobMenu.classList.add('hidden'); }; });
+
+// ===== NAVBAR SCROLL =====
+var nav = document.getElementById('nav');
+var bttBtn = document.getElementById('bttBtn');
+window.addEventListener('scroll', function() {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+    bttBtn.classList.toggle('show', window.scrollY > 500);
+});
+bttBtn.onclick = function() { window.scrollTo({top:0,behavior:'smooth'}); };
+
+// ===== SCROLL REVEAL =====
+var revObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold:0.08, rootMargin:'0px 0px -40px 0px'});
+function observeAll() { document.querySelectorAll('.anim-reveal').forEach(function(el){ revObs.observe(el); }); }
+
+// ===== PARTIKEL HERO =====
+(function() {
+    var box = document.getElementById('particleBox');
+    for (var i = 0; i < 20; i++) {
+        var p = document.createElement('div');
+        p.className = 'particle';
+        var sz = 2 + Math.random()*4;
+        p.style.width = sz+'px'; p.style.height = sz+'px';
+        p.style.left = Math.random()*100+'%';
+        p.style.top = (50+Math.random()*50)+'%';
+        p.style.animation = 'rise '+(8+Math.random()*14)+'s linear '+(Math.random()*10)+'s infinite';
+        box.appendChild(p);
+    }
+})();
+
+// ===== RENDER MATERI =====
+function renderMateri(filter) {
+    var grid = document.getElementById('materiGrid');
+    var f = (filter||'').toLowerCase();
+    var html = '';
+    materi.forEach(function(m) {
+        if (f && m.judul.toLowerCase().indexOf(f) === -1 && m.ringkasan.toLowerCase().indexOf(f) === -1) return;
+        html += '<div class="card-hover rounded-2xl p-5 cursor-pointer anim-reveal visible" onclick="openModal('+m.id+')">' +
+            '<div class="w-12 h-12 rounded-xl bg-gradient-to-br '+m.warna+' flex items-center justify-center mb-4 shadow-lg"><i class="'+m.ikon+' text-white"></i></div>' +
+            '<span class="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">'+m.bab+'</span>' +
+            '<h3 class="font-bold text-base mt-1 mb-2 leading-snug" style="color:var(--fg)">'+m.judul+'</h3>' +
+            '<p class="text-sm leading-relaxed mb-3" style="color:var(--muted)">'+m.ringkasan+'</p>' +
+            '<span class="inline-flex items-center gap-1 text-sm font-semibold text-red-600 dark:text-red-400">Pelajari <i class="fas fa-arrow-right text-xs"></i></span>' +
+            '</div>';
+    });
+    if (!html) html = '<p class="col-span-full text-center py-10" style="color:var(--muted)">Materi tidak ditemukan.</p>';
+    grid.innerHTML = html;
+}
+document.getElementById('searchInput').oninput = function(e) { renderMateri(e.target.value); };
+
+// ===== MODAL MATERI =====
+function openModal(id) {
+    var m = null;
+    for (var i = 0; i < materi.length; i++) { if(materi[i].id === id) { m = materi[i]; break; } }
+    if (!m) return;
+    document.getElementById('modalBadge').textContent = m.bab;
+    document.getElementById('modalTitle').textContent = m.judul;
+    document.getElementById('modalBody').innerHTML = m.isi;
+    document.getElementById('materiModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+    document.getElementById('materiModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.getElementById('materiModal').onclick = function(e) { if(e.target === this) closeModal(); };
+document.addEventListener('keydown', function(e) { if(e.key === 'Escape') closeModal(); });
+
+// ===== RENDER TIMELINE =====
+(function() {
+    var box = document.getElementById('timelineBox');
+    var html = '';
+    timeline.forEach(function(t, i) {
+        var kiri = i % 2 === 0;
+        html += '<div class="relative flex items-start gap-5 lg:gap-0 anim-reveal">' +
+            '<div class="absolute left-5 lg:left-1/2 w-3.5 h-3.5 rounded-full bg-red-600 tl-dot z-10 -translate-x-1/2 mt-1.5"></div>' +
+            '<div class="ml-12 lg:ml-0 '+(kiri?'lg:mr-auto lg:pr-10 lg:text-right lg:w-[calc(50%-20px)]':'lg:ml-auto lg:pl-10 lg:text-left lg:w-[calc(50%-20px)]')+'">' +
+            '<div class="p-4 rounded-2xl border transition-all hover:shadow-md" style="background:var(--card);border-color:var(--border)">' +
+            '<span class="inline-block bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold px-2.5 py-0.5 rounded-full mb-1.5">'+t.tahun+'</span>' +
+            '<h4 class="font-bold text-base mb-1" style="color:var(--fg)">'+t.judul+'</h4>' +
+            '<p class="text-sm leading-relaxed" style="color:var(--muted)">'+t.desc+'</p>' +
+            '</div></div></div>';
+    });
+    box.innerHTML = html;
+})();
+
+// ===== KUIS =====
+var QS = {idx:0, jawaban:[], timer:600, interval:null, benar:0, salah:0};
+
+function mulaiKuis() {
+    QS = {idx:0, jawaban:[], timer:600, interval:null, benar:0, salah:0};
+    document.getElementById('quizStart').classList.add('hidden');
+    document.getElementById('quizEnd').classList.add('hidden');
+    document.getElementById('quizPlay').classList.remove('hidden');
+    document.getElementById('qTimer').classList.remove('text-red-600');
+    QS.interval = setInterval(function() {
+        QS.timer--;
+        var mm = Math.floor(QS.timer/60), ss = QS.timer%60;
+        document.getElementById('qTimer').textContent = String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+        if (QS.timer <= 60) document.getElementById('qTimer').classList.add('text-red-600');
+        if (QS.timer <= 0) { clearInterval(QS.interval); tampilHasil(); }
+    }, 1000);
+    renderSoal();
+}
+
+function renderSoal() {
+    var s = kuisData[QS.idx], n = QS.idx + 1;
+    document.getElementById('qNum').textContent = n+'/10';
+    document.getElementById('qBar').style.width = (n*10)+'%';
+    document.getElementById('qText').innerHTML = '<span class="text-red-600 mr-2">'+n+'.</span>'+s.q;
+    document.getElementById('qFeedback').innerHTML = '';
+    var nb = document.getElementById('qNext'); nb.classList.add('hidden'); nb.classList.remove('inline-flex');
+    var labels = ['A','B','C','D'];
+    var html = '';
+    s.o.forEach(function(opt, i) {
+        html += '<div class="opt-btn rounded-xl p-4 flex items-center gap-3" data-i="'+i+'" onclick="pilihJawaban('+i+')">' +
+            '<span class="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm shrink-0" style="background:var(--bg);border:1px solid var(--border);color:var(--fg)">'+labels[i]+'</span>' +
+            '<span class="text-sm font-medium" style="color:var(--fg)">'+opt+'</span></div>';
+    });
+    document.getElementById('qOpts').innerHTML = html;
+}
+
+function pilihJawaban(i) {
+    if (QS.jawaban[QS.idx] !== undefined) return;
+    var s = kuisData[QS.idx];
+    QS.jawaban[QS.idx] = i;
+    var ok = i === s.a;
+    if (ok) QS.benar++; else QS.salah++;
+    document.querySelectorAll('.opt-btn').forEach(function(el) {
+        var idx = parseInt(el.getAttribute('data-i'));
+        el.classList.add('locked');
+        el.style.pointerEvents = 'none';
+        if (idx === s.a) el.classList.add('show-correct');
+        if (idx === i && !ok) el.classList.add('picked-wrong');
+        if (idx === i && ok) el.classList.add('picked-correct');
+    });
+    var fb = document.getElementById('qFeedback');
+    fb.innerHTML = '<div class="flex items-start gap-2 '+(ok?'text-emerald-600':'text-red-600')+'"><i class="fas '+(ok?'fa-check-circle':'fa-times-circle')+' mt-0.5"></i><div><p class="font-semibold text-sm">'+(ok?'Benar!':'Salah!')+'</p><p class="text-xs mt-0.5" style="color:var(--muted)">'+s.e+'</p></div></div>';
+    var nb = document.getElementById('qNext');
+    nb.classList.remove('hidden'); nb.classList.add('inline-flex');
+    nb.innerHTML = QS.idx < 9 ? 'Selanjutnya <i class="fas fa-arrow-right text-xs"></i>' : 'Lihat Hasil <i class="fas fa-chart-pie text-xs"></i>';
+}
+
+function nextQ() {
+    if (QS.idx < 9) { QS.idx++; renderSoal(); }
+    else tampilHasil();
+}
+
+function tampilHasil() {
+    clearInterval(QS.interval);
+    document.getElementById('quizPlay').classList.add('hidden');
+    document.getElementById('quizEnd').classList.remove('hidden');
+    var skor = Math.round((QS.benar/10)*100);
+    document.getElementById('endScore').textContent = skor;
+    var circ = 2 * Math.PI * 52;
+    setTimeout(function(){ document.getElementById('endRing').style.strokeDashoffset = circ - (skor/100)*circ; }, 100);
+    var t, d;
+    if (skor>=90){t='Luar Biasa!';d='Kamu benar-benar menguasai materi PKN. Pertahankan!';}
+    else if(skor>=70){t='Bagus Sekali!';d='Pemahamanmu sudah baik. Terus tingkatkan!';}
+    else if(skor>=50){t='Cukup Baik';d='Beberapa materi perlu dipelajari lagi. Jangan menyerah!';}
+    else{t='Perlu Belajar Lagi';d='Baca kembali materi dan ulangi kuis ini. Kamu pasti bisa!';}
+    document.getElementById('endTitle').textContent = t;
+    document.getElementById('endDesc').textContent = d;
+    var waktu = 600 - QS.timer;
+    document.getElementById('endStats').innerHTML =
+        '<div class="text-center"><div class="text-2xl font-bold text-emerald-600">'+QS.benar+'</div><div class="text-xs" style="color:var(--muted)">Benar</div></div>' +
+        '<div class="text-center"><div class="text-2xl font-bold text-red-600">'+QS.salah+'</div><div class="text-xs" style="color:var(--muted)">Salah</div></div>' +
+        '<div class="text-center"><div class="text-2xl font-bold text-amber-600">'+Math.floor(waktu/60)+':'+String(waktu%60).padStart(2,'0')+'</div><div class="text-xs" style="color:var(--muted)">Waktu</div></div>';
+    toast(skor>=70?'Skor '+skor+', hebat!':'Skor '+skor+', coba lagi!', skor>=70?'success':'warning');
+}
+
+function ulangiKuis() {
+    document.getElementById('quizEnd').classList.add('hidden');
+    document.getElementById('quizStart').classList.remove('hidden');
+    document.getElementById('qTimer').textContent = '10:00';
+    document.getElementById('endRing').style.strokeDashoffset = 326.7;
+}
+
+// ===== COCOKKAN =====
+var MS = {pick:null, score:0, done:0};
+
+function renderMatch() {
+    var items = [];
+    matchData.forEach(function(m, i) {
+        items.push({t:'istilah', txt:m.istilah, pid:i});
+        items.push({t:'penjelasan', txt:m.penjelasan, pid:i});
+    });
+    for (var i = items.length-1; i > 0; i--) { var j = Math.floor(Math.random()*(i+1)); var tmp=items[i]; items[i]=items[j]; items[j]=tmp; }
+    var html = '';
+    items.forEach(function(item) {
+        var lbl = item.t === 'istilah' ? '<span class="text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400">Istilah</span>' : '<span class="text-xs font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Penjelasan</span>';
+        html += '<div class="match-btn p-3.5 rounded-xl" data-t="'+item.t+'" data-p="'+item.pid+'" onclick="pickMatch(this)">'+lbl+'<p class="text-sm font-medium mt-1" style="color:var(--fg)">'+item.txt+'</p></div>';
+    });
+    document.getElementById('matchBox').innerHTML = html;
+}
+
+function pickMatch(el) {
+    if (el.classList.contains('done')) return;
+    var t = el.getAttribute('data-t'), p = el.getAttribute('data-p');
+    if (!MS.pick) {
+        MS.pick = el;
+        el.classList.add('active-pick');
+    } else {
+        if (MS.pick === el) {
+            el.classList.remove('active-pick');
+            MS.pick = null;
+            return;
+        }
+        var ft = MS.pick.getAttribute('data-t'), fp = MS.pick.getAttribute('data-p');
+        if (ft === t) {
+            MS.pick.classList.remove('active-pick');
+            MS.pick = el;
+            el.classList.add('active-pick');
+            return;
+        }
+        if (fp === p) {
+            MS.pick.classList.add('done'); MS.pick.classList.remove('active-pick');
+            el.classList.add('done');
+            MS.score++; MS.done++;
+            document.getElementById('matchScore').textContent = MS.score;
+            toast('Pasangan benar!','success');
+            if (MS.done === matchData.length) {
+                document.getElementById('matchDone').classList.remove('hidden');
+                toast('Semua pasangan tercocokkan!','success');
+            }
+        } else {
+            var first = MS.pick;
+            el.classList.add('shake-it'); first.classList.add('shake-it');
+            setTimeout(function(){
+                el.classList.remove('shake-it'); first.classList.remove('shake-it');
+                el.classList.remove('active-pick'); first.classList.remove('active-pick');
+            }, 400);
+            toast('Salah, coba lagi!','error');
+        }
+        MS.pick = null;
+    }
+}
+
+function resetMatch() {
+    MS = {pick:null, score:0, done:0};
+    document.getElementById('matchScore').textContent = '0';
+    document.getElementById('matchDone').classList.add('hidden');
+    renderMatch();
+}
+
+// ===== GLOSARIUM =====
+function renderGlos(filter) {
+    var box = document.getElementById('glosBox');
+    var f = (filter||'').toLowerCase();
+    var html = '';
+    glosData.forEach(function(g, i) {
+        if (f && g.istilah.toLowerCase().indexOf(f) === -1 && g.def.toLowerCase().indexOf(f) === -1) return;
+        html += '<div class="rounded-xl border overflow-hidden transition-all hover:shadow-md" style="background:var(--card);border-color:var(--border)">' +
+            '<button class="w-full flex items-center justify-between p-4 text-left" onclick="toggleAcc(this)">' +
+            '<div class="flex items-center gap-3">' +
+            '<span class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 text-xs font-bold">'+(i+1)+'</span>' +
+            '<span class="font-semibold text-sm" style="color:var(--fg)">'+g.istilah+'</span></div>' +
+            '<i class="fas fa-chevron-down acc-chevron text-xs" style="color:var(--muted)"></i></button>' +
+            '<div class="acc-body px-4 pb-0">' +
+            '<p class="text-sm leading-relaxed pb-4 pl-10" style="color:var(--muted)">'+g.def+'</p></div></div>';
+    });
+    if (!html) html = '<p class="text-center py-8" style="color:var(--muted)">Istilah tidak ditemukan.</p>';
+    box.innerHTML = html;
+}
+
+function toggleAcc(btn) {
+    var body = btn.nextElementSibling;
+    var chev = btn.querySelector('.acc-chevron');
+    body.classList.toggle('open');
+    chev.classList.toggle('rot');
+}
+
+document.getElementById('glosSearch').oninput = function(e) { renderGlos(e.target.value); };
+
+// ===== INIT =====
+renderMateri('');
+renderMatch();
+renderGlos('');
+observeAll();
+</script>
+</body>
+</html>
