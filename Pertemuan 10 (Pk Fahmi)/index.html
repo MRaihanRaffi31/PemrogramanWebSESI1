@@ -6,7 +6,7 @@
     <title>Pemrograman Web Sesi 2</title>
     <style>
         body {
-            font-family: "Segoe UI", 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             display: flex;
             justify-content: center;
@@ -19,6 +19,7 @@
             background-color: rgb(93, 215, 97);
             color: #333;
         }
+
         body.mode-gelap {
             background-color: rgb(34, 34, 34);
             color: #eee;
@@ -30,12 +31,13 @@
             text-align: center;
             max-width: 400px;
             transition: background-color 0.4s, box-shadow 0.4s;
-            
         }
+
         body.mode-terang .kartu {
             background-color: #fff;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 1);
         }
+
         body.mode-gelap .kartu {
             background-color: #444;
             box-shadow: 0 10px 20px rgba(255, 255, 255, 0.5);
@@ -51,11 +53,43 @@
             background-color: aquamarine;
             color: white;
             margin-top: 20px;
+            transition: background-color 0.3s, transform 0.2s;
         }
 
+        button:hover {
+            background-color: rgb(30, 114, 231);
+            transform: translateY(-3px);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
-<body>
-    
+<body class="mode-terang">
+    <div class="kartu">
+        <h1>Halo, nama saya Muhammad Raihan Raffi</h1>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni, odit vitae magnam repellat possimus eveniet iste sit laudantium quis libero quod temporibus, architecto porro ipsam sapiente rem repellendus. Consectetur, dolorum!</p>
+        <p>Ini adalah contoh halaman web dengan menggunakan HTML, CSS, dan JS.</p>
+        <p>Coba klik Tombol di bawah ini</p>
+        <button id="tombolTema">Aktifkan Tema Gelap</button>
+    </div>
+
+    <script>
+        const tombolTema = document.getElementById('tombolTema');
+        const body = document.body;
+
+        tombolTema.addEventListener('click', function () {
+            if (body.classList.contains('mode-terang')) {
+                body.classList.remove('mode-terang');
+                body.classList.add('mode-gelap');
+                tombolTema.textContent = 'Aktifkan Tema Terang';
+            } else {
+                body.classList.remove('mode-gelap');
+                body.classList.add('mode-terang');
+                tombolTema.textContent = 'Aktifkan Tema Gelap';
+            }
+        });
+    </script>
 </body>
 </html>
