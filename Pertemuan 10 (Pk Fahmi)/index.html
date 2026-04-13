@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemrograman Web Sesi 2</title>
+    <style>
+        body {
+            font-family: "Segoe UI", 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.4s, color 0.4s;
+        }
+
+        body.mode-terang {
+            background-color: rgb(93, 215, 97);
+            color: #333;
+        }
+        body.mode-gelap {
+            background-color: rgb(34, 34, 34);
+            color: #eee;
+        }
+
+        .kartu {
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            transition: background-color 0.4s, box-shadow 0.4s;
+            
+        }
+        body.mode-terang .kartu {
+            background-color: #fff;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 1);
+        }
+        body.mode-gelap .kartu {
+            background-color: #444;
+            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            background-color: aquamarine;
+            color: white;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    
+</body>
+</html>
